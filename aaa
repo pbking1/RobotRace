@@ -1,0 +1,1107 @@
+#include "background.h"
+//  ”√∫Í∂®“Â∂®“Â∂Êª˙ƒ£ Ωµƒ≥ı º◊¥Ã¨“‘º∞Ω«∂»◊™ªª¬
+#define DELTA1 550
+#define OPP1 1
+#define R1 145
+#define DELTA2 490
+#define OPP2 0
+#define R2 160
+#define DELTA3 450
+#define OPP3 0
+#define R3 160
+#define DELTA4 140
+#define OPP4 1
+#define R4 155
+#define DELTA9 510
+#define OPP9 0
+#define R9 140
+#define DELTA10 540
+#define OPP10 1
+#define R10 140
+#define DELTA11 400
+#define OPP11 0
+#define R11 150
+#define DELTA12 520
+#define OPP12 1
+#define R12 170
+#define DELTA14 420
+#define OPP14 1
+#define R14 150
+#define DELTA13 490
+#define OPP13 1
+#define R13 180
+//  ”√∫Í∂®“ÂΩ´∂Êª˙∫≈”Î√˚◊÷Ω·∫œ£¨∑Ω±„–ﬁ∏ƒ
+#define wheel_LB 6
+#define wheel_LF 8
+#define wheel_RB 5
+#define wheel_RF 7
+#define leg_R 1
+#define leg_L 3
+#define foot_R 2
+#define foot_L 4
+#define hand_L1 9
+#define hand_L2 10
+#define hand_L3 11
+#define hand_R1 12
+#define hand_R2 14
+#define hand_R3 13
+#define head 14
+//  ”√∫Í∂®“ÂΩ´∫ÏÕ‚≤‚æ‡µƒid”Î√˚◊÷Ω·∫œ£¨∑Ω±„–ﬁ∏ƒ
+#define distance_upL 2
+#define distance_upC 0
+#define distance_upR 1
+#define distance_wheelLF 3
+#define distance_wheelLB 5
+#define distance_wheelRF 4
+#define distance_wheelRB 6
+#define distance_belowR 7
+//  ”√∫Í∂®“ÂΩ´∫ÏÕ‚Ω”Ω¸µƒid”Î√˚◊÷Ω·∫œ£¨∑Ω±„–ﬁ∏ƒ
+#define approach_L1 1
+#define approach_L2 2
+#define approach_C 3
+#define approach_R2 4
+#define approach_R1 5
+
+//  ∏√∫Ø ˝”√”⁄±Í∂®∂Êª˙ƒ£ Ωµƒ∂Êª˙µƒŒª÷√
+//  Õ®π˝∂Êª˙–˝◊™Ω«∂»”ÎŒª÷√÷µ÷Æº‰≥…±»¿˝µƒπÿœµ
+//  Õ®π˝ºÚµ•µÿ∏ÊÀﬂ∫Ø ˝“™◊™∂‡…ŸΩ«∂»£¨»√∆‰◊‘∂ØΩ¯––ªªÀ„
+//  √ø∏ˆ∂Êª˙µ± ÷ªÚΩ≈∆Ω÷±µƒ ±∫ÚŒ™0
+void setservopos(int num,int pos,int speed)
+{
+    float position = (float)pos/45;
+    if(num == 1)
+        MFSetServoPos(1, OPP1?(DELTA1+position*R1):(DELTA1-position*R1),speed);
+    if(num == 2)
+        MFSetServoPos(2,  OPP2?(DELTA2+position*R2):(DELTA2-position*R2),speed);
+    if(num == 3)
+        MFSetServoPos(3,  OPP3?(DELTA3+position*R3):(DELTA3-position*R3),speed);
+    if(num == 4)
+        MFSetServoPos(4,  OPP4?(DELTA4+position*R4):(DELTA4-position*R4),speed);
+    if(num == 12)
+        MFSetServoPos(12, OPP12?(DELTA12+position*R12):(DELTA12-position*R12),speed);
+    if(num == 13)
+        MFSetServoPos(13, OPP13?(DELTA13+position*R13):(DELTA13-position*R13),speed);
+    if(num == 14)
+        MFSetServoPos(14,  OPP14?(DELTA14+position*R14):(DELTA14-position*R14),speed);
+    if(num == 10)
+        MFSetServoPos(10, OPP10?(DELTA10+position*R10):(DELTA10-position*R10),speed);
+    if(num == 11)
+        MFSetServoPos(11, OPP11?(DELTA11+position*R11):(DELTA11-position*R11),speed);
+    if(num == 9)
+        MFSetServoPos(9,  OPP9?(DELTA9+position*R12):(DELTA9-position*R9),speed);
+}
+
+/************************************ DEFINE ***************************************/
+
+/************************************ LEDµ∆≤‚ ‘ ************************************/
+void LED(char dir) {
+    int id1 = -1;
+    int id2 = -1;
+    if (dir == 'l') {id1 = 0; id2 = 0;}
+    else if (dir == 'r') {id1 = 6; id2 = 6;}
+    else if (dir == 'b') {id1 = 0; id2 = 6;}
+    MFDigiOutput(id1, 0);
+    MFDigiOutput(id2, 0);
+    DelayMS(1000);
+    MFDigiOutput(id1, 1);
+    MFDigiOutput(id2, 1);
+}
+/************************************ LEDµ∆≤‚ ‘ ************************************/
+
+/************************************ ªÒ»°¥´∏–∆˜≤Œ ˝ *******************************/
+
+//   ªÒ»°æﬂÃÂAD
+int AD(int id) {
+    return MFGetAD(id);
+}
+
+//   ªÒ»°æﬂÃÂIO
+int IO(int id) {
+    return MFGetDigiInput(id);
+}
+
+//  ªÒ»°÷––ƒ◊¯±Í
+int X() {
+    return MFCapGetCenterX();
+}
+int Y() {
+    return MFCapGetCenterY();
+}
+
+//  ªÒ»°”––ß…´ ˝øÈ
+int color_block() {
+    return MFCapGetSum();
+}
+
+/************************************ ªÒ»°¥´∏–∆˜≤Œ ˝ *******************************/
+
+/************************************ »Ìø™πÿ *****************************************/
+//  Õ®π˝ª˙∆˜»À–ÿ«∞µƒ∫ÏÕ‚≤‚æ‡¥´∏–∆˜∑µªÿµƒ ˝÷µ¿¥≈–∂œª˙∆˜»À «∑Ò±ªº§ªÓ
+void switch_open() {
+    while (1) {
+		if (AD(distance_upC) > 300 && (AD(distance_upR) > 300 || AD(distance_upL) > 300)) {
+            break;
+		}
+    }
+}
+/************************************ »Ìø™πÿ *****************************************/
+
+/************************************ µ◊≈Ã∑÷Ω‚∂Ø◊˜ *********************************/
+//  Õ£÷π∂Ø◊˜
+void stop() {
+    MFSetServoRotaSpd(wheel_RB, 0);
+    MFSetServoRotaSpd(wheel_RF, 0);
+    MFSetServoRotaSpd(wheel_LB, 0);
+    MFSetServoRotaSpd(wheel_LF, 0);
+    MFServoAction();
+    DelayMS(50);
+}
+//  À´Õ»µƒ∂Ø◊˜
+void set_posture(int leg, int spd_L, int foot, int spd_F, int delay) {
+    setservopos(1, leg, spd_L);
+    setservopos(3, leg, spd_L);
+    setservopos(2, foot, spd_F);
+    setservopos(4, foot, spd_F);
+    MFServoAction();
+    DelayMS(delay);
+}
+//  œÚ«∞◊ﬂ
+void move_forward(int spd, int delay) {
+    MFSetServoRotaSpd(wheel_RB, -1 * spd);
+    MFSetServoRotaSpd(wheel_RF, -1 * spd);
+    MFSetServoRotaSpd(wheel_LB, spd);
+    MFSetServoRotaSpd(wheel_LF, spd);
+    MFServoAction();
+    DelayMS(delay);
+}
+//  œÚ∫Û◊ﬂ
+void move_back(int spd, int delay) {
+    MFSetServoRotaSpd(wheel_RB, spd);
+    MFSetServoRotaSpd(wheel_RF, spd);
+    MFSetServoRotaSpd(wheel_LB, -1 * spd);
+    MFSetServoRotaSpd(wheel_LF, -1 * spd);
+    MFServoAction();
+    DelayMS(delay);
+}
+//  “‘1000µƒÀŸ∂»œÚ◊Û◊™
+void turn_left_fast(int delay, int center) {
+    int spd[10];
+    int wheel_tmp = (wheel_LB == center ? wheel_LF : wheel_LB);
+    for (int i = 0; i < 10; i++) {
+        spd[i] = 1000;
+    }
+    spd[center] = 0;
+    spd[wheel_tmp] = spd[wheel_tmp] / 5 * 4;
+    MFSetServoRotaSpd(wheel_RB, -1 * spd[wheel_RB]);
+    MFSetServoRotaSpd(wheel_RF, -1 * spd[wheel_RF]);
+    MFSetServoRotaSpd(wheel_LB, -1 * spd[wheel_LB]);
+    MFSetServoRotaSpd(wheel_LF, -1 * spd[wheel_LF]);
+    MFServoAction();
+    DelayMS(delay);
+    stop();
+}
+// “‘400µƒÀŸ∂»œÚ◊Û◊™, ”√”⁄µ˜’˚Œª÷√
+void turn_left_slowly(int delay) {
+    MFSetServoRotaSpd(wheel_LF, -400);
+    MFSetServoRotaSpd(wheel_LB, 0);
+    MFSetServoRotaSpd(wheel_RF, -500);
+    MFSetServoRotaSpd(wheel_RB, -500);
+    MFServoAction();
+    DelayMS(delay);
+}
+// ◊Û◊™∫Û”√”⁄∏¥‘≠
+void turn_left_back(int delay) {
+    MFSetServoRotaSpd(wheel_LF, 0);
+    MFSetServoRotaSpd(wheel_LB, 400);
+    MFSetServoRotaSpd(wheel_RF, 500);
+    MFSetServoRotaSpd(wheel_RB, 500);
+    MFServoAction();
+    DelayMS(delay);
+}
+// “‘1000µƒÀŸ∂»œÚ”“◊™
+void turn_right_fast(int delay, int center) {
+    int spd[10];
+    int wheel_tmp = (wheel_RB == center ? wheel_RF : wheel_RB);
+    for (int i = 0; i < 10; i++) {
+        spd[i] = 1000;
+    }
+    spd[center] = 0;
+    spd[wheel_tmp] = spd[wheel_tmp] / 5 * 4;
+    MFSetServoRotaSpd(wheel_RB, spd[wheel_RB]);
+    MFSetServoRotaSpd(wheel_RF, spd[wheel_RF]);
+    MFSetServoRotaSpd(wheel_LB, spd[wheel_LB]);
+    MFSetServoRotaSpd(wheel_LF, spd[wheel_LF]);
+    MFServoAction();
+    DelayMS(delay);
+    stop();
+}
+// “‘500µƒÀŸ∂»œÚ”“◊™, ”√”⁄µ˜’˚Œª÷√
+void turn_right_slowly(int delay) {
+    MFSetServoRotaSpd(wheel_LF, 500);
+    MFSetServoRotaSpd(wheel_LB, 500);
+    MFSetServoRotaSpd(wheel_RF, 400);
+    MFSetServoRotaSpd(wheel_RB, 0);
+    MFServoAction();
+    DelayMS(delay);
+}
+// “‘500µƒÀŸ∂»œÚ”“◊™, ”√”⁄µ˜’˚Œª÷√
+void turn_right_slowly_2(int delay) {
+    MFSetServoRotaSpd(wheel_LF, 400);
+    MFSetServoRotaSpd(wheel_LB, 400);
+    MFSetServoRotaSpd(wheel_RF, 300);
+    MFSetServoRotaSpd(wheel_RB, 0);
+    MFServoAction();
+    DelayMS(delay);
+}
+// ”“◊™∫Û”√”⁄∏¥‘≠
+void turn_right_back(int delay) {
+    MFSetServoRotaSpd(wheel_LF, -500);
+    MFSetServoRotaSpd(wheel_LB, -500);
+    MFSetServoRotaSpd(wheel_RF, 0);
+    MFSetServoRotaSpd(wheel_RB, -400);
+    MFServoAction();
+    DelayMS(delay);
+}
+//  ‘≠µÿ–˝◊™
+void spin(char dir, int speed, int delay) {
+    int spd[10];
+    int dir_ = 1;
+    if (dir == 'l') dir_ = -1;
+    for (int i = wheel_RB; i <= wheel_LF; i++) {
+		spd[i] = dir_ * speed;
+    }
+    MFSetServoRotaSpd(wheel_LF, spd[wheel_LF]);
+    MFSetServoRotaSpd(wheel_LB, spd[wheel_LB]);
+    MFSetServoRotaSpd(wheel_RF, spd[wheel_RF]);
+    MFSetServoRotaSpd(wheel_RB, spd[wheel_RB]);
+    MFServoAction();
+    DelayMS(delay);
+}
+//  ∫ÛÕÀ≤¢µ˜’˚ª˙∆˜»À”Î∫Û±ﬂΩÁµƒœ‡∂‘Œª÷√
+//  ±£÷§ª˙∆˜»À «”Î∫Û±ﬂΩÁ¥π÷±µƒ
+void move_back_adjust() {
+    while (1) {
+        move_back(300, 10);
+        if (AD(distance_wheelLB) < 165 && AD(distance_wheelRB) >= 165) {
+            while (1) {
+                MFSetServoRotaSpd(wheel_LF,500);
+                MFSetServoRotaSpd(wheel_LB, 0);
+                MFSetServoRotaSpd(wheel_RF, 400);
+                MFSetServoRotaSpd(wheel_RB, 400);
+                MFServoAction();
+                DelayMS(10);
+                if (AD(5) < 165 && AD(6) < 165) {
+                    stop();
+                    MFSetServoRotaSpd(wheel_LF, -400);
+                    MFSetServoRotaSpd(wheel_LB, 0);
+                    MFSetServoRotaSpd(wheel_RF, -500);
+                    MFSetServoRotaSpd(wheel_RB, -500);
+                    MFServoAction();
+                    DelayMS(100);
+                    stop();
+                    break;
+                }
+            }
+            break;
+        }
+        else if (AD(distance_wheelRB) < 165 && AD(distance_wheelLB) >= 165) {
+            while (1) {
+                MFSetServoRotaSpd(wheel_LF,-400);
+                MFSetServoRotaSpd(wheel_LB, -400);
+                MFSetServoRotaSpd(wheel_RF, -500);
+                MFSetServoRotaSpd(wheel_RB, 0);
+                MFServoAction();
+                DelayMS(10);
+                if (AD(5) < 165 && AD(6) < 165) {
+                    MFSetServoRotaSpd(wheel_LF, -400);
+                    MFSetServoRotaSpd(wheel_LB, -400);
+                    MFSetServoRotaSpd(wheel_RF, -500);
+                    MFSetServoRotaSpd(wheel_RB, 0);
+                    MFServoAction();
+                    DelayMS(0);
+                    //stop();
+                    break;
+                }
+            }
+            break;
+        }
+        else if (AD(5) < 165 && AD(6) < 165) {
+            stop();
+            break;
+        }
+    }
+    stop();
+    return;
+}
+//  µ±robot”Îƒø±Í∂‘◊º∫Ûµ˜’˚robot”Îƒø±Í÷Æº‰µƒæ‡¿Î
+void distance(int d) {
+    int d1 = 0;
+    int d2 = 0;
+    d1 = d - 3;
+    d2 = d + 3;
+    int count = 0;
+    while (1) {
+        count += 1;
+        if ((AD(0) > d1 && AD(0) < d2) || count == 5) {
+			stop();
+			break;
+        }
+        if (AD(0) > d) {
+			while (1) {
+                if (AD(0) <= d) {
+                    stop();
+                    break;
+                }
+                move_back(250, 10);
+			}
+        } else if (AD(0) < d) {
+			while (1) {
+                if (AD(0) >= d) {
+                    stop();
+                    break;
+                }
+                move_forward(250, 10);
+			}
+        }
+    }
+    return;
+}
+//  Õ®π˝∑ΩœÚ¿¥∏ƒ±‰Õ∑…œ∂Êª˙µƒΩ«∂»
+void turn_head(char dir) {
+    if (dir == 'm') {
+		MFSetServoPos(15, 556, 500);
+        MFServoAction();
+        DelayMS(800);
+    } else if (dir == 'r') {
+		MFSetServoPos(15, 237, 500);
+        MFServoAction();
+        DelayMS(800);
+    } else if (dir == 'l') {
+		MFSetServoPos(15, 849, 500);
+        MFServoAction();
+        DelayMS(800);
+    }
+}
+
+void test(int Hmax, int Hmin, int Smax, int Smin) {
+    MFCapSetH(Hmax,Hmin);
+    MFCapSetS(Smax,Smin);
+    while(1){
+        if(X() >= 100 && X() <= 300 && color_block() > 100)
+			LED('b');
+    }
+}
+
+void camera_back() {
+    int Hmax = 100;
+    int Hmin = 45;
+    int Smax = 75;
+    int Smin = 23;
+    MFCapSetH(Hmax,Hmin);
+    MFCapSetS(Smax,Smin);
+    move_forward(1023, 500);
+    
+    stop();
+    turn_head('r');
+    set_posture(-40, 50, 45, 50, 500);
+    
+    while (1) {
+		if (X() > 160) LED('l');
+		if (color_block() > 500) LED('r');
+		if (X() > 160 && color_block() > 500) {
+            LED('b');
+            stop();
+            break;
+		} else {
+            move_back(400, 50);
+		}
+    }
+    
+    while (1) {
+		if (X() < 320)
+			LED('l');
+		else if (color_block() > 200)
+			LED('r');
+		if (X() < 320 && color_block() > 200) {
+            LED('b');
+            stop();
+            break;
+		} else {
+            turn_right_slowly_2(100);
+		}
+    }
+    
+    stop();
+    
+    
+}
+
+void camera(int Hmax, int Hmin, int Smax, int Smin) {
+    MFCapSetH(Hmax,Hmin);
+    MFCapSetS(Smax,Smin);
+    move_forward(1023, 4000);
+    
+    stop();
+    turn_head('r');
+    set_posture(-40, 50, 45, 50, 500);
+    
+    while (1) {
+		if (X() > 160) LED('l');
+		if (color_block() > 500) LED('r');
+		if (X() > 160 && color_block() > 500) {
+            LED('b');
+            stop();
+            break;
+		} else {
+            move_forward(400, 50);
+		}
+    }
+    
+    stop();
+    turn_head('m');
+    
+    while (1) {
+		if (X() < 320)
+			LED('l');
+		else if (color_block() > 200)
+			LED('r');
+		if (X() < 320 && color_block() > 200) {
+            LED('b');
+            stop();
+            break;
+		} else {
+            turn_right_slowly_2(100);
+		}
+    }
+    
+    stop();
+    
+    
+}
+/************************************ µ◊≈Ã∑÷Ω‚∂Ø◊˜ *********************************/
+
+/************************************  ÷≤ø∑÷Ω‚∂Ø◊˜ *********************************/
+
+//  Get_Ready ◊º±∏∂Ø◊˜
+void Get_Ready() {
+    turn_head('m');
+    //   …ÌÃÂœÚ«∞«„–±
+    setservopos(leg_R,-20,50);
+    setservopos(foot_R,25,50);
+    setservopos(leg_L,-20,50);
+    setservopos(foot_L,25,50);
+    //    ÷±≥‘⁄∫Û√Ê
+    setservopos(hand_R1,90,150);
+    setservopos(hand_R2,80,100);
+    setservopos(hand_R3,0,200);
+    setservopos(hand_L1,130,300);
+    setservopos(hand_L2,80,100);
+    setservopos(hand_L3,0,200);
+    MFServoAction();
+    DelayMS(1500);
+}
+
+//  step1_ª” ÷
+void step1_huishou() {
+    //   ”“ ÷…Ï÷±
+    {
+        setservopos(14,0,300);
+        setservopos(12,0,300);
+        setservopos(13,0,300);
+        MFServoAction();
+        DelayMS(1000);
+    }
+    MFMp3Play((char*)&("¬º“Ù.mp3"),8);
+    //   ª” ÷
+    int i = 0;
+    for (i = 0; i < 4; i++)
+    {
+        {
+            setservopos(14,30,500);
+            MFServoAction();
+            DelayMS(100);
+            setservopos(13,15,500);
+            MFServoAction();
+            DelayMS(1200);
+        }
+        {
+            setservopos(13,-15,500);
+            MFServoAction();
+            DelayMS(100);
+            setservopos(14,-30,500);
+            MFServoAction();
+            DelayMS(1200);
+        }
+    }
+    Get_Ready();
+}
+
+//  step2_±ß«Ú
+void step2_baoqiu_1() {
+    //    ÷±€◊™µΩ«∞√Ê
+    {
+        //   …ÌÃÂœÚ∫Û«„–±
+        setservopos(1,10,50);
+        setservopos(2,-10,50);
+        setservopos(3,10,50);
+        setservopos(4,-10,50);
+        //  µ⁄∂˛∏ˆπÿΩ⁄Õ‚∑≠“‘∑¿¥ÚµΩ÷˘◊”
+        setservopos(12,-90,200);
+        setservopos(9,-120,180);
+        setservopos(10,-40,150);
+        setservopos(14,-40,150);
+        MFServoAction();
+        DelayMS(6000);
+    }
+    //   ±ß◊°÷˘◊”
+    {
+        setservopos(10,22,200);
+        setservopos(14,20,200);
+        MFServoAction();
+        DelayMS(1500);
+    }
+    //    ÷±€…œÃß
+    {
+        setservopos(11,10,100);
+        setservopos(13,10,100);
+        setservopos(12,-50,300);
+        setservopos(9,-57,300);
+        MFServoAction();
+        DelayMS(2000);
+    }
+    return;
+}
+
+void step2_baoqiu_2() {
+    setservopos(10,-10,200);
+    setservopos(14,-10,200);
+    MFServoAction();
+    DelayMS(800);
+    Get_Ready();
+}
+
+//  Õ∆÷˘◊”
+void step3_tuizhuzi() {
+    //    ÷±€◊™µΩ«∞√ÊÕ¨ ±µ⁄∂˛∏ˆπÿΩ⁄œÚÕ‚∑≠£¨“‘∑¿¥ÚµΩ÷˘◊” && …ÌÃÂÕ˘∫Û«„–±
+    {
+        setservopos(12,-90,200);
+        setservopos(9,-120,180);
+        setservopos(10,-40,150);
+        setservopos(14,-40,150);
+        
+        setservopos(1,10,50);
+        setservopos(2,-15,50);
+        setservopos(3,10,50);
+        setservopos(4,-15,50);
+        MFServoAction();
+        DelayMS(4000);
+    }
+    //   ±ß◊≈÷˘◊”
+    {
+        setservopos(10,25,150);
+        setservopos(14,-5,150);
+        setservopos(11,-65,150);
+        setservopos(13,-45,150);
+        MFServoAction();
+        DelayMS(2000);
+    }
+}
+
+//   À… ÷∫Ø ˝
+void step3_tuizhuzi_songshou() {
+    {
+        setservopos(10,0,150);
+        setservopos(14,-30,150);
+        //move_forward_veryfast();   //push zhu zi
+        MFServoAction();
+        DelayMS(800);
+    }
+}
+
+//  ◊Ó∫ÛÕ∆÷˘◊”“ªœ¬µƒ∂Ø◊˜
+void step3_tuizhuzi_push() {
+    move_back(1000, 800);
+    stop();
+    
+    setservopos(9, -110, 150);
+    setservopos(12, -90, 200);
+    setservopos(10,35,150);
+    setservopos(14,0,150);
+    MFServoAction();
+    DelayMS(1500);
+    
+    while (1) {
+		move_forward(500, 10);
+		if (AD(distance_wheelLF) < 100) {
+            stop();
+            break;
+		}
+    }
+    stop();
+    setservopos(9, 0, 200);
+    setservopos(12, 0, 200);
+    MFServoAction();
+    DelayMS(1500);
+}
+//  step4_«√¬‡
+void step4_qiaoluo() {
+    //  ±‹√‚¥ÚµΩÕ∑
+    {
+        setservopos(10, 0, 200);
+        setservopos(14, 0, 200);
+        setservopos(9, 0, 150);
+        setservopos(12, 0, 150);
+        MFServoAction();
+        DelayMS(1500);
+    }
+    //   ¡Ω ÷œÚ«∞«„–±&&…ÌÃÂªÿ∏¥÷±¡¢
+    {
+        setservopos(1, -58, 125);
+        setservopos(3, -58, 125);
+        setservopos(2, 45, 100);
+        setservopos(4, 45, 100);
+        // setservopos(14,0,100);
+        // setservopos(10,0,100);
+        MFServoAction();
+        DelayMS(1000);
+        
+        
+        setservopos(14,75,100);
+        setservopos(10,80,100);
+        setservopos(12,-110,300);
+        setservopos(13,0,200);
+        setservopos(9,-90,150);
+        setservopos(11,0,200);
+        MFServoAction();
+        DelayMS(4000);
+    }
+    //   ¡Ω ÷œÚÕ‚¥Ú£¨«√ª˜¬‡
+    {
+        int i = 0;
+        for (i = 0; i < 3; i++) {
+            {
+				setservopos(13,-75,800);
+                setservopos(11,-75,800);
+                setservopos(10,45,800);
+                setservopos(14,45,800);
+				MFServoAction();
+				DelayMS(800);
+                
+				setservopos(13,0,800);
+                setservopos(11,0,800);
+                setservopos(10,80,800);
+                setservopos(14,75,800);
+				MFServoAction();
+				DelayMS(800);
+            }
+        }
+    }
+    //  ±‹√‚¥ÚµΩÕ∑
+    {
+        setservopos(10, 0, 200);
+        setservopos(14, 0, 200);
+        setservopos(9, 0, 150);
+        setservopos(12, 0, 150);
+        MFServoAction();
+        DelayMS(1500);
+    }
+}
+
+//   step5_dance
+void step5_dance() {
+    //   ÷±€æŸ∆°™°™standby
+    {
+        // setservopos(10,0,150);
+        setservopos(14,0,150);
+        MFServoAction();
+        DelayMS(500);
+        
+        setservopos(12,0,150);
+        // setservopos(9,0,150);
+        MFServoAction();
+        DelayMS(1500);
+    }
+    //  ¡Ω ÷Õ‚’≈
+    {
+        // setservopos(10,-90,100);
+        // setservopos(14,-90,100);
+        setservopos(12, -100, 150);
+        setservopos(14, 80, 150);
+        MFServoAction();
+        DelayMS(2000);
+    }
+    //  æœπ™
+    {
+        set_posture(0, 100, 25, 100, 1000);
+    }
+    //  ±‹√‚¥ÚµΩÕ∑
+    {
+        setservopos(14, 0, 200);
+        setservopos(12, 0, 150);
+        MFServoAction();
+        DelayMS(1500);
+    }
+    Get_Ready();
+}
+/************************************  ÷≤ø∑÷Ω‚∂Ø◊˜ *********************************/
+
+/***************************** sensor && feedback *************************/
+
+//   feedback∫Ø ˝
+void feedback(int* result) {
+    int delay = 0;
+    
+    if (result[0] > 0) delay = result[0] * 16;
+    else delay = result[0] * (-1) * 18;
+    
+    if (result[0] > 0) {
+        turn_left_back(delay);
+        stop();
+    } else if (result[0] < 0) {
+        turn_right_back(delay);
+        stop();
+    }
+    result[0] = 0;
+    return;
+}
+
+//   sensor∫Ø ˝
+void sensor(int step, int delay[]) {
+    int d = 0;
+    if (step == 1) d = 250;
+    else if (step == 2) d = 210;
+    else if (step == 3) d = 280;
+    
+    if (IO(approach_L1) + IO(approach_L2) != 2) {
+        while (1) {
+            turn_left_slowly(10);
+            delay[0] = delay[0] + 1;
+            if (IO(approach_C) == 0 && (IO(approach_R1) + IO(approach_R2)+ IO(approach_L2) + IO(approach_L1) == 4)) {
+                stop();
+                while (1) {
+                    move_forward(300, 10);
+                    if (AD(distance_upC) > d || AD(distance_upR) > d - 8|| AD(distance_upL) > d - 8) {
+						stop();
+						break;
+                    }
+                }
+                break;
+            }
+        }
+    } else if (IO(approach_R2) + IO(approach_R1) != 2) {
+        while (1) {
+            turn_right_slowly(10);
+            delay[0] = delay[0] - 1;
+            if (IO(approach_C) == 0 && (IO(approach_R1) + IO(approach_R2) + IO(approach_L1) + IO(approach_L2) == 4)) {
+                stop();
+                while (1) {
+                    move_forward(300, 10);
+                    if (AD(distance_upC) > d || AD(distance_upR) > d - 8|| AD(distance_upL) > d - 8) {
+						stop();
+						break;
+                    }
+                }
+                break;
+            }
+        }
+    } else if (IO(approach_C) == 0 && IO(approach_R1) + IO(approach_R2) + IO(approach_L1) + IO(approach_L2) == 4) {
+        stop();
+        delay[0] = delay[0];
+        while (1) {
+            move_forward(300, 10);
+            if (AD(distance_upC) > d || AD(distance_upL) > d - 8 || AD(distance_upR) > d - 8) {
+                stop();
+                break;
+            }
+        }
+    }
+    return;
+}
+
+//   ”√”⁄Ã¯≥ˆÕ‚≤ø—≠ª∑µƒsensor_2
+int sensor_2(int step) {
+    int d = 0;
+    if (step == 1) d = 250;
+    else if (step == 2) d = 210;
+    else if (step == 3) d = 280;
+    if (IO(approach_C) == 0 &&
+        (IO(approach_R2) + IO(approach_R1) + IO(approach_L2) + IO(approach_L1) == 4) &&
+        (AD(distance_upC) > d || AD(distance_upR) > d - 8 || AD(distance_upL) > d) ) return 1;
+    return 0;
+}
+
+/***************************** sensor && feedback *************************/
+//  »´æ÷±‰¡ø
+int delay_flag[1] = {0};
+/***************************** ∑÷≤ø¡˜≥Ã ***********************************/
+
+//   step1
+void step1() {
+    Get_Ready();
+    set_posture(-45, 125, 45, 100, 2000);
+    move_forward(1023, 6500);
+    stop();
+    DelayMS(100);
+    
+    set_posture(15, 125, 0, 100, 1000);
+    turn_right_fast(2000, wheel_RB);//turn right 90 degree
+    
+    move_back_adjust();
+    stop();
+    set_posture(-25, 125, 25, 100, 500);
+    
+    while(1)                //sensor
+    {
+        move_forward(1000, 10);
+        sensor(1, delay_flag);
+        if(sensor_2(1) == 1)
+        {
+            stop();
+            break;
+        }
+    }
+    step1_huishou();
+    feedback(delay_flag);
+}
+
+//   step2
+void step2() {
+    move_back(1000, 2400);   //go back
+    stop();
+    
+    turn_left_fast(2450, wheel_LB);
+    
+    while (1) {
+        move_forward(1000, 10);   //go forward
+        sensor(2, delay_flag);
+        if(sensor_2(2) == 1)
+        {
+            stop();
+            break;
+        }
+    }
+    
+    distance(205);
+    stop();
+    
+    step2_baoqiu_1();    //get the ball
+    feedback(delay_flag);
+    while (1) {
+		move_back(1000, 10);
+		if (AD(distance_wheelRB) < 165 || AD(distance_wheelLB) < 165) {
+            stop();
+            break;
+		}
+    }
+    stop();
+    
+    move_forward(500, 300);
+    stop();
+    spin('r', 1000, 1700);
+    stop();
+    move_forward(500, 500);
+    stop();
+    step2_baoqiu_2();
+    spin('r', 1000, 3300);
+    stop();
+    
+    // move_forward(1000, 1000);
+    // stop();
+    
+    move_back_adjust();
+    stop();
+    
+    // step2_baoqiu_2();
+    
+    while (1) {
+		sensor(3, delay_flag);
+        if(sensor_2(3) == 1) {
+            stop();
+            break;
+        }
+		move_forward(1000, 10);
+    }
+    stop();
+    
+    step3_tuizhuzi();   //tui zhu zi
+    feedback(delay_flag);
+    
+    move_forward(1000, 3500);   //push zhu zi
+    
+    step3_tuizhuzi_songshou();    //song shou
+    while (1) {
+		move_forward(500, 10);
+		if (AD(distance_wheelLF) < 100) {
+            stop();
+            break;
+		}
+    }
+    
+    step3_tuizhuzi_push();
+    
+    Get_Ready();
+}
+
+//   step3
+void step3() {
+    //spin 180 degree
+    spin('r', 1000, 3200);
+    
+    move_forward(1000, 1000);
+    move_back_adjust();
+    stop();
+    
+    move_forward(1000, 1900);
+    
+    // turn to left 90 degree
+    turn_left_fast(2450, wheel_LB);
+    stop();
+    
+    while (1) {
+		if (AD(distance_upC) > 165 && (AD(distance_upR) > 160 || AD(distance_upL) > 160)) {
+            stop();
+            break;
+		}
+        move_forward(1000, 10);
+    }
+    stop();
+    
+    step4_qiaoluo();
+    
+    Get_Ready();
+}
+
+//   step4
+void step4() {
+    move_back(1000, 3300);
+    stop();
+    
+    turn_right_fast(2450, wheel_RB);
+    
+    move_forward(1000, 2100);
+    stop();
+    
+    turn_left_fast(2400, wheel_LB);
+    
+    step5_dance();
+    
+}
+
+//    step5
+void step5() {
+    int delay = 0;
+    while (1) {
+        move_back(1000, 10);
+        if (AD(distance_wheelRB) < 165 || AD(distance_wheelLB) < 165) {
+            stop();
+            break;
+        }
+    }
+    
+    move_forward(1000, 1000);
+    move_back_adjust();
+    stop();
+    
+    //   turn_right_90degree_5hao();
+    turn_right_fast(2300, wheel_RB);
+    
+    while (1) {
+        move_forward(700, 10);
+        if (AD(distance_belowR) < 110) {
+            delay = 0;
+            int r = 0;
+            while (1) {
+                MFSetServoRotaSpd(8, -400);
+                MFSetServoRotaSpd(6, 0);
+                MFSetServoRotaSpd(7, -500);
+                MFSetServoRotaSpd(5, -500);
+                MFServoAction();
+                DelayMS(10);
+                r = r + 1;
+                
+                if (AD(distance_belowR) >= 110) {
+					delay = r * 15;
+					MFSetServoRotaSpd(8, 0);
+                    MFSetServoRotaSpd(6, 400);
+                    MFSetServoRotaSpd(7, 500);
+                    MFSetServoRotaSpd(5, 500);
+                    MFServoAction();
+					DelayMS(delay);
+					stop();
+					break;
+                }
+            }
+            //  continue;
+        }
+        //if (io[1] + io[2] + io[3] + io[4] + io[5] != 5) {
+        if (IO(approach_R1) + IO(approach_R2) + IO(approach_L1) + IO(approach_L2) != 4) {
+            stop();
+            Get_Ready();
+            break;
+        }
+        
+        if ((AD(distance_wheelRB) + AD(distance_wheelLB) - AD(distance_wheelRF) - AD(distance_wheelLF)) >= 220) {
+            setservopos(1, 30, 125);    //make yourself lower
+            setservopos(3, 30, 125);
+            setservopos(2, -25, 100);
+            setservopos(4, -25, 100);
+            MFServoAction();
+            DelayMS(1000);
+        }
+    }
+    return;
+}
+
+/***************************** ∑÷≤ø¡˜≥Ã ***********************************/
+
+/************************************ ÷˜∫Ø ˝ ***************************************/
+int main(int argc, char * argv[])
+{
+    MFCapOpen();
+    MFInit();
+    MFSetPortDirect(0x00000041);
+    MFADEnable(0);
+    MFADEnable(1);
+    MFADEnable(2);
+    MFADEnable(3);
+    MFADEnable(4);
+    MFADEnable(5);
+    MFADEnable(6);
+    MFADEnable(7);
+    MFDigiInit(100);
+    DelayMS(100);
+    MFADInit(100);
+    MFSetServoMode(1,0);
+    MFSetServoMode(2,0);
+    MFSetServoMode(3,0);
+    MFSetServoMode(4,0);
+    MFSetServoMode(5,1);
+    MFSetServoMode(6,1);
+    MFSetServoMode(7,1);
+    MFSetServoMode(8,1);
+    MFSetServoMode(9,0);
+    MFSetServoMode(10,0);
+    MFSetServoMode(11,0);
+    MFSetServoMode(12,0);
+    MFSetServoMode(13,0);
+    MFSetServoMode(14,0);
+    MFSetServoMode(15,0);
+    MFDigiOutput(0, 1);
+    MFDigiOutput(6, 1);
+    
+    Get_Ready();
+    while (1) {
+        switch_open();
+        /*
+         step1();
+         step2();
+         step3();
+         step4();
+         step5();
+         */
+        //camera(180, 116, 120, 70);
+        camera_back();
+    }
+    return 0;
+}
+/************************************ ÷˜∫Ø ˝ ***************************************/
