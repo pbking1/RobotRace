@@ -1,0 +1,95 @@
+void test(int Hmax, int Hmin, int Smax, int Smin) {      //find the center of the object
+    MFCapSetH(Hmax,Hmin);
+    MFCapSetS(Smax,Smin);
+    while(1){
+        if(X() >= 100 && X() <= 300 && color_block() > 100)
+			LED('b');
+    }
+}
+
+void camera_back() {             //find the yellow
+    int Hmax = 100;
+    int Hmin = 45;
+    int Smax = 75;
+    int Smin = 23;
+    MFCapSetH(Hmax,Hmin);
+    MFCapSetS(Smax,Smin);
+    move_back(1023, 100);
+    
+    stop();
+    turn_head('r');
+    set_posture(-40, 50, 45, 50, 500);
+    
+    while (1) {
+		if (X() < 160) LED('l');
+		if (color_block() > 500) LED('r');
+		if (X() < 160 && color_block() > 500) {
+            LED('b');
+            stop();
+            break;
+		} else {
+            move_back(400, 50);
+		}
+    }
+    
+    while (1) {
+		if (X() < 240)
+			LED('l');
+		else if (color_block() > 200)
+			LED('r');
+		if (X() < 240 && color_block() > 200) {
+            LED('b');
+            stop();
+            break;
+		} else {
+            turn_right_slowly_2(100);
+		}
+    }
+    
+    stop();
+    
+    
+}
+
+void camera(int Hmax, int Hmin, int Smax, int Smin) {   //find the green
+    MFCapSetH(Hmax,Hmin);
+    MFCapSetS(Smax,Smin);
+    move_forward(1023, 4000);
+    
+    stop();
+    turn_head('r');
+    set_posture(-40, 50, 45, 50, 500);
+    
+    while (1) {
+		if (X() > 160) LED('l');
+		if (color_block() > 500) LED('r');
+		if (X() > 160 && color_block() > 500) {
+            LED('b');
+            stop();
+            break;
+		} else {
+            move_forward(400, 50);
+		}
+    }
+    
+    stop();
+    turn_head('m');
+    
+    while (1) {
+		if (X() < 320)
+			LED('l');
+		else if (color_block() > 200)
+			LED('r');
+		if (X() < 320 && color_block() > 200) {
+            LED('b');
+            stop();
+            break;
+		} else {
+            turn_right_slowly_2(100);
+		}
+    }
+    
+    stop();
+    
+    
+}
