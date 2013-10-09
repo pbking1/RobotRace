@@ -1,0 +1,90 @@
+void camera_back(int Hmax, int Hmin, int Smax, int Smin, int x1, int s1, int x2, int s2) {     //yellow
+   // int Hmax = 100;
+  //  int Hmin = 45;
+  //  int Smax = 75;
+  //  int Smin = 23;
+  //x1 = 160, s1 = 500, x2 = 240, s2 = 200
+    MFCapSetH(Hmax,Hmin);
+    MFCapSetS(Smax,Smin);
+    move_back(1023, 100);
+    
+    stop();
+    turn_head('r');
+    set_posture(-40, 50, 45, 50, 500);
+    
+    while (1) {
+		if (X() < x1) LED('l');
+		if (color_block() > s1) LED('r');
+		if (X() < x1 && color_block() > s1) {
+            LED('b');
+            stop();
+            break;
+		} else {
+            move_back(400, 50);
+		}
+    }
+    
+    while (1) {
+		if (X() < x2)
+			LED('l');
+		else if (color_block() > s2)
+			LED('r');
+		if (X() < x2 && color_block() > s2) {
+            LED('b');
+            stop();
+            break;
+		} else {
+            turn_right_slowly_2(100);
+		}
+    }
+    
+    stop();
+    
+    
+}
+
+void camera(int Hmax, int Hmin, int Smax, int Smin, int x1, int s1, int x2, int s2) {     //green
+
+    //x1 = 160, s1 = 500, x2 = 320, s2 = 200
+
+    MFCapSetH(Hmax,Hmin);
+    MFCapSetS(Smax,Smin);
+    move_forward(1023, 4000);
+    
+    stop();
+    turn_head('r');
+    set_posture(-40, 50, 45, 50, 500);
+    
+    while (1) {
+		if (X() > x1) LED('l');
+		if (color_block() > s1) LED('r');
+		if (X() > x1 && color_block() > s1) {
+            LED('b');
+            stop();
+            break;
+		} else {
+            move_forward(400, 50);
+		}
+    }
+    
+    stop();
+    turn_head('m');
+    
+    while (1) {
+		if (X() < x2)
+			LED('l');
+		else if (color_block() > s2)
+			LED('r');
+		if (X() < x2 && color_block() > s2) {
+            LED('b');
+            stop();
+            break;
+		} else {
+            turn_right_slowly_2(100);
+		}
+    }
+    
+    stop();
+    
+    
+}
