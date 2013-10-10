@@ -45,6 +45,7 @@ void camera_back(int Hmax, int Hmin, int Smax, int Smin, int x1, int s1, int x2,
 
 void camera(int Hmax, int Hmin, int Smax, int Smin, int x1, int s1, int x2, int s2) {     //green
 
+    //Hmax=180, Hmin=116, Smax=120, Smin=70
     //x1 = 160, s1 = 500, x2 = 320, s2 = 200
 
     MFCapSetH(Hmax,Hmin);
